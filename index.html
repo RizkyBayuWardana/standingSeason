@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Standings Season</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <style>
+        .header {
+            background-color: red;
+            font-weight: bold;
+        }
+        .search {
+            padding-top: 5px 5px;
+            padding-bottom: 4px;
+            margin-top: 20px;
+            border-radius: 20px;
+        }
+        .poin {
+            font-weight: bold;
+            text-align: center;
+        }
+        .header1 {
+            background-color: #fff;
+        }
+        .pos {
+            text-align: center;
+        }
+    </style>
+</head>
+  <body>
+    <div class="container-md">
+        <div class="cek">
+            <input class="search" type="search" id="tahun" style="text-align: center;">
+            <button id="cek" type="button" class="btn btn-primary" style="margin: 5px; padding-top: 2px; border-radius: 20px;">CEK</button>
+        </div>
+        <table class="table table-stripe">
+            <thead class="text-center">
+                <tr class="header1">
+                    <th colspan="9">
+                        <h1 id="leagueTitle"></h1>
+                        <h2 id="leagueSeason"></h2>
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="header1">
+                <tr class="header">
+                    <td class="pos">Pos</td>
+                    <td>Club</td>
+                    <td>M</td>
+                    <td>M</td>
+                    <td>S</td>
+                    <td>K</td>
+                    <td>GM</td>
+                    <td>GA</td>
+                    <td>SG</td>
+                    <td class="poin">Point</td>
+                </tr>
+                <tr id="lastRow"></tr>
+            </tbody>
+        </table>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function () {
+        fetchStanding(2021)
+
+        $('#cek').click(function () {
+            var tahun = $('#tahun').val()
+            $('tbody').html("<tr class='header'><td class='pos'>Pos</td><td>Club</td><td>M</td><td>M</td><td>S</td><td>K</td><td>GM</td><td>GA</td><td>SG</td><td class='poin'>Point</td></tr><tr id='lastRow'></tr>")
+            fetchStanding(tahun)
+        })
+    })
+
+    function fetchStanding(tahun){
+      fetch('https://api-football-standings.azharimm.site/leagues/eng.1/standings?season='+tahun+'&sort=asc')
+      .then(res => res.json())
+      .then((hasil) => {
+        console.log(hasil.data)
+        document.getElementById("leagueTitle").innerHTML = hasil.data.name
+        document.getElementById("leagueSeason").innerHTML = hasil.data.seasonDisplay
+
+        hasil.data.standings.forEach((club) => { renderClub(club) })
+      })
+      .catch(err => console.log(err))
+    }
+    
+    function renderClub(club) {
+            let a = ""
+            a += "<tr>"
+            a += "<td class='pos'>"+club.stats[8].value+"</td>"
+            a += "<td><img src='"+club.team.logos[0].href+"' style='height:30px; width:30px;'> "+club.team.displayName+"</td>"
+            a += "<td>"+club.stats[3].value+"</td>"
+            a += "<td>"+club.stats[0].value+"</td>"
+            a += "<td>"+club.stats[2].value+"</td>"
+            a += "<td>"+club.stats[1].value+"</td>"
+            a += "<td>"+club.stats[4].value+"</td>"
+            a += "<td>"+club.stats[5].value+"</td>"
+            a += "<td>"+club.stats[9].value+"</td>"
+            a += "<td class='poin'>"+club.stats[6].value+"</td>"
+            a += "</tr>"
+
+            $('#lastRow').before(a)
+    }
+    </script>
+</body>
+</html>
